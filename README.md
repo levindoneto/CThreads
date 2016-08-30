@@ -22,7 +22,7 @@ inteiro de bilhete (0-255), percorre-se essa lista sempre salvando o elemento
 anterior na tentativa de encontrar o número referente ao bilhete, se chegar em 
 um valor maior que o número de bilhete pesquisado, compara-se a diferença desse
 valor com o inteiro do bilhete com a diferença entre o valor anterior e o bilhete.
-A thread que tiver a diferença menor diferença sai do estado de apto e vai para o executando.
+A thread que tiver a menor diferença sai do estado de apto e vai para o executando.
 
 ### Design Top-Down
 ![TOP-DOWN](/resources/Top-Down_Diagram.png)
