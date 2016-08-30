@@ -1,43 +1,59 @@
 # CThreads
+__Autores:__ Béuren F. Beclhin, Eduardo Brito, Levindo Neto
 
 https://docs.google.com/document/d/17syKIuhr6S4mYxGgzHB40oW_B9EHaY-LuGk40YL93KE/edit
 
+### Estrutura dos Estados
 
-Estrutura dos Estados
+A fila de aptos é apenas uma fila encadeada simples, uma vez que como é usado o 
+sorteio para a seleção de qual será o processo usado, não tem como ser FIFO ou SJF.
+Para os bloqueados, será uma fila FIFO para aqueles que foram bloqueados pelo semáforo. 
 
+Também haverá uma fila para processos bloqueados por ter dado cjoin, 
+que ficam bloqueados esperando a thread. Quando as threads são finalizadas
+é necessário fazer a varredura para verificar se algum bloqueado pode passar para apto. 
 
-A fila de aptos é apenas uma fila encadeada simples, uma vez que como é usado o sorteio para a seleção de qual será o processo usado, não tem como ser FIFO ou SJF. Para os bloqueados, será uma fila FIFO para aqueles que foram bloqueados pelo semáforo. 
+### Sorteio de bilhetes
 
-Também haverá uma fila para processos bloqueados por ter dado cjoin, que ficam bloqueados esperando a thread. Quando as threads são finalizadas é necessário fazer a varredura para verificar se algum bloqueado pode passar para apto. 
+Pode-se implementar uma lista duplamente encadeada, na qual, dado um número 
+inteiro de bilhete (0-255), percorre-se essa lista sempre salvando o elemento 
+anterior na tentativa de encontrar o número referente ao bilhete, se chegar em 
+um valor maior que o número de bilhete pesquisado, compara-se a diferença desse
+valor com o inteiro do bilhete com a diferença entre o valor anterior e o bilhete.
+A thread que tiver a diferença menor diferença sai do estado de apto e vai para o executando.
 
+### Funções da API
 
-Sorteio de bilhetes (organização)
-
-
-Pode-se implementar uma lista duplamente encadeada, na qual, dado um número inteiro de bilhete (0-255), percorre-se essa lista sempre salvando o elemento anterior na tentativa de encontrar o número referente ao bilhete, se chegar em um valor maior que o número de bilhete pesquisado, compara-se a diferença desse valor com o inteiro do bilhete com a diferença entre o valor anterior e o bilhete. A thread que tiver a diferença menor diferença sai do estado de apto e vai para o executando.
-
-
+#### CCreate
+```c
 int ccreate (void *(*start)(void *), void *arg); 
+```
 
+Cria uma TCB, usando o valor TID. Para saber o valor do TID usado terá uma variável 
+de controle que é incrementada a cada criação de thread, que será usada para o TID, 
+garantindo que ele é sempre diferente. Também colocamos o valor em ticket para o valor 
+randômico gerado usando a função passada pelo professor. O estado até poderia começar
+em 0 para indicar a criação, mas como após criado vai para 1, indicando que está apto, 
+é colocado diretamente 1.
 
-O que faremos:
-Cria uma TCB, usando o valor TID. Para saber o valor do TID usado terá uma variável de controle que é incrementada a cada criação de thread, que será usada para o TID, garantindo que ele é sempre diferente. Também colocamos o valor em ticket para o valor randômico gerado usando a função passada pelo professor. O estado até poderia começar em 0 para indicar a criação, mas como após criado vai para 1, indicando que está apto, é colocado diretamente 1.
+__Parâmetros:__ 
+* start: ponteiro para a função que a thread executará. 
+* arg: um parâmetro que pode ser passado para a thread na sua criação. 
+* (Obs.: é um único parâmetro. Se for necessário passar mais de um valor deve-se empregar um ponteiro para uma struct) 
 
-Parâmetros: start: ponteiro para a função que a thread executará. arg: um parâmetro que pode ser passado para a thread na sua criação. (Obs.: é um único parâmetro. Se for necessário passar mais de um valor deve-se empregar um ponteiro para uma struct) 
+__Retorno:__ 
+Quando executada corretamente retorna um valor positivo, que representa o 
+identificador da thread criada. Caso contrário, retorna um valor negativo.
 
-Retorno: Quando executada corretamente: retorna um valor positivo, que representa o identificador da thread criada Caso contrário, retorna um valor negativo.
-
-
+```c
 typedef struct s_TCB { 
 
 int tid; // identificador da thread int state; // estado em que a thread se encontra // 0: Criação; 1: Apto; 2: Execução; 3: Bloqueado e 4: Término 
-
 int ticket; // “bilhete” de loteria da thread, para uso do escalonador 
-
 ucontext_t context; // contexto de execução da thread (SP, PC, GPRs e recursos) 
 
 } TCB_t;
-
+```
 int cyield(void); 
 
 O que faremos:
@@ -122,4 +138,4 @@ void escalonador(void);
 Responsável também por fazer a varredura dos bloqueados para verificar se a thread que recém finalizou e chamou o escalonador libera algum desses processos, que passará para a fila de aptos.
 
 
-__Autores:__ Béuren F. Beclhin, Eduardo Brito, Levindo Neto
+
