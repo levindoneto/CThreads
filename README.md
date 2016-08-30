@@ -110,7 +110,7 @@ int csem_init (csem_t *sem, int count);
 ```
 
 Faz a inicialização do semáforo colocando csem_t=1.
-Há uma ligação entre as variáveis de semágoro e suas respectivas threads bloqueadas esperando liberação.
+Há uma ligação entre as variáveis de semáforo e suas respectivas threads bloqueadas esperando liberação.
 
 __Parâmetros:__
 sem: ponteiro para uma variável do tipo csem_t. Aponta para uma estrutura de dados que representa a variável semáforo.
