@@ -98,9 +98,23 @@ int csem_init (csem_t *sem, int count);
 
 Inicializa variável do semáforo em 1, utiliza o count (inteiro que mostra a quantidade de recursos que o semáforo está controlando). O valor inicial do semáforo tem que ser 1 para se ter exclusão mútua. A variável sem deve ter junto a ela uma estrutura com o registro das threads que estão bloqueadas. Essa lista inicia vazia.
 
-__Parâmetros:__ sem: ponteiro para uma variável do tipo csem_t. Aponta para uma estrutura de dados que representa a variável semáforo. count: valor a ser usado na inicialização do semáforo. Representa a quantidade de recursos controlados pelo semáforo.
+__Parâmetros:__ sem: ponteiro para uma variável do tipo csem_t. Aponta para uma estrutura de dados que representa a variável semáforo. 
+count: valor a ser usado na inicialização do semáforo. Representa a quantidade de recursos controlados pelo semáforo.
 
 __Retorno:__ Quando executada corretamente: retorna 0 (zero) Caso contrário, retorna um valor negativo.
+
+#### CSem_init
+
+```c
+int csem_init (csem_t *sem, int count);
+```
+__Parâmetros:__
+sem: ponteiro para uma variável do tipo csem_t. Aponta para uma estrutura de dados que representa a variável semáforo.
+count: valor a ser usado na inicialização do semáforo. Representa a quantidade de recursos controlados pelo semáforo.
+
+__Retorno:__
+Quando executada corretamente: retorna 0 (zero). Caso contrário, retorna um valor negativo
+
 
 #### CWait
 
