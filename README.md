@@ -3,6 +3,8 @@ __Autores:__ Béuren F. Beclhin, Eduardo Brito, Levindo Neto
 
 https://docs.google.com/document/d/17syKIuhr6S4mYxGgzHB40oW_B9EHaY-LuGk40YL93KE/edit
 
+![States](/resources/States.png)
+
 ### Estrutura dos Estados
 
 A fila de aptos é apenas uma fila encadeada simples, uma vez que como é usado o 
@@ -21,6 +23,9 @@ anterior na tentativa de encontrar o número referente ao bilhete, se chegar em
 um valor maior que o número de bilhete pesquisado, compara-se a diferença desse
 valor com o inteiro do bilhete com a diferença entre o valor anterior e o bilhete.
 A thread que tiver a diferença menor diferença sai do estado de apto e vai para o executando.
+
+### Design Top-Down
+![TOP-DOWN](/resources/Top-Down_Diagram.png)
 
 ### Funções da API
 
@@ -139,7 +144,7 @@ int csignal (csem_t *sem);
 ```
 
 Como precisa de algo pra avisar que a thread que estava usando um recurso parou de usar, a csignal faz isso, daí apenas incrementa a variável de semáforo (V(s)), daí verifica na fila de bloqueados do semáforo quem estava esperando pelo recurso e libera pro uso.
-Parâmetros:  Apenas um ponteiro para a variável de semáforo.
+__Parâmetros:__  Apenas um ponteiro para a variável de semáforo.
 
 #### CIdentify
 
