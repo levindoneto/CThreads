@@ -12,11 +12,11 @@ int init = 0;
 int ccreate (void* (*start)(void*), void *arg){
 	//__init__ queue and main's TCB
 	if(init != 1){ // Thread has not initialized yet
-		able_queue = (PFILA2) malloc(sizeof(PFILA2));
+		ables = (PFILA2) malloc(sizeof(PFILA2));
 		block_join = (PFILA2) malloc(sizeof(PFILA2));
 		block = (PFILA2) malloc(sizeof(PFILA2));
 		
-		CreateFila2(able_queue);
+		CreateFila2(ables);
 		CreateFila2(block_join);
 		CreateFila2(block);
 
@@ -35,3 +35,18 @@ int ccreate (void* (*start)(void*), void *arg){
 	finish_context->uc_link = NULL;
 	/* Modify the context */
 	makecontext(finish_context, (void (*)(void))EndPoint, 0);
+
+	getcontext(context);
+	context->uc_stack.ss_sp = (char*) malloc(16384);
+	context->uc_stack.ss_size = 16384;
+	context->uc_link = finish_context;
+	makecontext(context, (void (*)(void))start, 1, arg);
+
+	TCB_t* thread = TCB_create(context);
+
+	/* Put ables in the able queue */
+	AppendFila2(ables, (void (*)(void)) thread);
+
+	/* Return the Thread Identifier*/
+	return thread->tid;
+};
