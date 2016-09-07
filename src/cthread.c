@@ -24,3 +24,14 @@ int ccreate (void* (*start)(void*), void *arg){
 		init = 1;    // __init__ thread
 	}
 	}
+
+	/* Create a new TCB with enter function */
+	ucontext_t* finish_context = (ucontext_t*) malloc(sizeof(ucontext_t));
+
+	/* __Init__ the data structure for the run flow */
+	getcontext(finish_context);
+	/* Define Stack */
+	finish_context->uc_stack.ss_sp = (char*) malloc(16384); //Stack Size = 16384
+	finish_context->uc_link = NULL;
+	/* Modify the context */
+	makecontext(finish_context, (void (*)(void))EndPoint, 0);
