@@ -29,4 +29,27 @@ ucontext_t* allocator_init()
 	return allocation_context;
 }
 
+void* EndPoint()
+{
+	if(FirstFila2(block_join) == 0){
+		join_t* join_t1; // Create a join, that have information about the 
+						 // threads that aren't finished.
+		do{
+			join_t1 = GetAtIteratorFila2(block_join);
 
+			if(join_t1 != NULL)
+				if(run_t->tid == join_t1->wait){
+					join_t1->thread->state = PROCST_APTO;
+					/* Put threads from join in the able queue */
+					AppendFila2(ables, join_t1->thread);
+					/* Remove threads blocked from join */
+					DeleteAtIteratorFila2(blocks_join);
+					break;
+				}
+		}while(NextFila2(blocks_join)==0);
+	}
+
+	free(run_t); // Only free space that was used by a thread in execution
+	dispatcher();
+	return 0;
+}
