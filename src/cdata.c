@@ -58,6 +58,7 @@ void* EndPoint()
 TCB_t* TCB_create_main()
 {
     TCB_t *thread = TCB_alloc();
+    
 	if(thread != NULL)
 	{
 		// Set the TID_counter for tid of thread created
@@ -75,5 +76,16 @@ TCB_t* TCB_create_main()
 TCB_t* TCB_create(ucontext_t* context)
 {
     TCB_t *thread = TCB_alloc();
+
+	if(thread != NULL)
+	{
+		// Set the TID_counter for tid of thread created
+		thread->tid = TID_counter;
+		// Put thread in the able state
+		thread->state = PROCST_APTO;
+		// For to have a unique TID for each thread	
+		TID_counter += 1;
+	}
+
     return thread;
 }
