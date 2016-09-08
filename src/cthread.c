@@ -107,6 +107,8 @@ int csignal(csem_t *sem){
 		if(freeTCB != NULL){
 		    /* Delete item from FIFO, thread is not blocked by the semaphore anymore  */
 			DeleteAtIteratorFila2(sem->fila);
+			/* Change state to 'able' */
+			freeTCB->state = PROCST_APTO;
 			/* Put the thread in the ables queue so it can run again */
 			AppendFila2(ables, freeTCB);
 		}
