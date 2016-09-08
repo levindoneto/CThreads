@@ -53,3 +53,10 @@ void* EndPoint()
 	dispatcher();
 	return 0;
 }
+
+TCB_t* TCB_create_main()
+{
+    TCB_t *thread = TCB_alloc();
+    return thread;
+}
+}
