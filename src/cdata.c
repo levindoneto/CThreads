@@ -85,6 +85,8 @@ TCB_t* TCB_create(ucontext_t* context)
 		thread->state = PROCST_APTO;
 		// For to have a unique TID for each thread	
 		TID_counter += 1;
+		// Set the context to the created thread
+		thread->context = *context;
 	}
 
     return thread;
