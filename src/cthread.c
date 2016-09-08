@@ -73,10 +73,11 @@ int cwait(csem_t *sem){
 		if(running_thread != NULL){
 		    /* Put running thread in the semaphore FIFO */
 			AppendFila2(sem->fila, (void *)running_thread);
-            /* Change state to blocked */
+			/* Change state to blocked */
 	    	running_thread->state = PROCST_BLOQ;
 	    	/* Saves context in the thread  */
 	    	getcontext(&running_thread->context);
+	    	dispatcher();
             return 0;
 	    
 		}
@@ -87,7 +88,7 @@ int cwait(csem_t *sem){
 			
 		}
 	}
-    /* If it has available resources it needs to decrement count and keep running the thread  */
+	/* If it has available resources it needs to decrement count and keep running the thread  */
 	else{
 		sem->count--;
 	}
@@ -98,10 +99,10 @@ int cwait(csem_t *sem){
 int csignal(csem_t *sem){
     /* Increments count to free resources  */
 	sem->count++;
-    /* Goes to the first item in the FIFO  */
+	/* Goes to the first item in the FIFO  */
 	if(FirstFila2(sem->fila) == 0){
 		TCB_t *freeTCB;
-        /* Get the first item in FIFO that will be freed  */
+		/* Get the first item in FIFO that will be freed  */
 		freeTCB = GetAtIteratorFila2(sem->fila);
 		if(freeTCB != NULL){
 		    /* Delete item from FIFO, thread is not blocked by the semaphore anymore  */
