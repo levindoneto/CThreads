@@ -59,4 +59,9 @@ TCB_t* TCB_create_main()
     TCB_t *thread = TCB_alloc();
     return thread;
 }
+
+TCB_t* TCB_create(ucontext_t* context)
+{
+    TCB_t *thread = TCB_alloc();
+    return thread;
 }
