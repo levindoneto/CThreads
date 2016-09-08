@@ -23,7 +23,6 @@ int ccreate (void* (*start)(void*), void *arg){
 		thread_main = TCB_create_main();
 		init = 1;    // __init__ thread
 	}
-	}
 
 	/* Create a new TCB with enter function */
 	ucontext_t* finish_context = (ucontext_t*) malloc(sizeof(ucontext_t));
