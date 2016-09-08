@@ -75,6 +75,7 @@ int cwait(csem_t *sem){
 			AppendFila2(sem->fila, (void *)running_thread);
 			/* Change state to blocked */
 	    	running_thread->state = PROCST_BLOQ;
+	    	sem->count--;
 	    	/* Saves context in the thread  */
 	    	getcontext(&running_thread->context);
 	    	dispatcher();
