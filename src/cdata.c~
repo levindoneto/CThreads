@@ -6,6 +6,7 @@
 #include "../include/cdata.h"
 #include <stdio.h>
 
+//Test
 int TID_counter = 0;
 
 ucontext_t* allocator_init()
@@ -90,23 +91,4 @@ TCB_t* TCB_create(ucontext_t* context)
 	}
 
 	return thread;
-}
-
-
-void dispatcher(){
-    int ticket;
-    ticket = random2() % 256; // Discard numbers with more than 255 bits
-    TCB_t *current_able;
-    //TODO search will be modified to return the closest number to the node that you are looking for
-    current_able = rb_search(control.able_threads,ticket);
-    if (swapcontext(&control.running_thread->context, &current_able->context) == -1){
-        printf("Error swapping");
-    }
-    else{
-        control.running_thread->state = PROCST_APTO;
-        running_thread = current_able;
-        running_thread->state = PROCST_EXEC;
-        
-        //setcontext(&runing_thread -> context);   /* Stay here the question */
-    }
 }
