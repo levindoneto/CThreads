@@ -20,11 +20,11 @@ ucontext_t* allocator_init()
 	// Create the context for the threads output
 	getcontext(allocation_context);
 	// Alloc a stack for the thread for the new context
-    allocation_context->uc_stack.ss_sp = (char*) malloc(16384);
-    allocation_context->uc_stack.ss_size = 16384;
-    allocation_context->uc_link = NULL;
+	allocation_context->uc_stack.ss_sp = (char*) malloc(16384);
+	allocation_context->uc_stack.ss_size = 16384;
+	allocation_context->uc_link = NULL;
 	// Modify the context for allocatation_context
-    makecontext(allocation_context, (void (*)(void))EndPoint, 0);
+	makecontext(allocation_context, (void (*)(void))EndPoint, 0);
 
 	return allocation_context;
 }
@@ -57,7 +57,7 @@ void* EndPoint()
 /* For create a main thread control block for a main*/
 TCB_t* TCB_create_main()
 {
-    TCB_t *thread = TCB_alloc();
+	TCB_t *thread = TCB_alloc();
     
 	if(thread != NULL)
 	{
@@ -69,13 +69,13 @@ TCB_t* TCB_create_main()
 		TID_counter += 1;
 	}
 
-    return thread;
+	return thread;
 }
 
 /* For create a thread control block for a thread*/
 TCB_t* TCB_create(ucontext_t* context)
 {
-    TCB_t *thread = TCB_alloc();
+	TCB_t *thread = TCB_alloc();
 
 	if(thread != NULL)
 	{
@@ -89,5 +89,5 @@ TCB_t* TCB_create(ucontext_t* context)
 		thread->context = *context;
 	}
 
-    return thread;
+	return thread;
 }
