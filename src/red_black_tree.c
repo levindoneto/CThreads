@@ -380,3 +380,13 @@ void rb_destroy_tree(RB_BST_TREE* self){
     free(self->nil);
     free(self);
 }
+
+int rb_get_key_max(RB_BST_TREE* self){
+    RB_BST_NODE* pt = self->root;
+    while (pt != self->nil)
+        pt = pt->right;
+    if (pt != self->nil)
+        return pt->key;
+    else
+        return 0;
+}

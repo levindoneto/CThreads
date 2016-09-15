@@ -7,45 +7,31 @@
 #include "../include/cdata.h"
 #include <stdio.h>
 
-int init = 0;
+control.init = FALSE;
 
 int ccreate (void* (*start)(void*), void *arg){
-	//__init__ queue and main's TCB
-	if(init != 1){ // Thread has not initialized yet
-		ables = (PFILA2) malloc(sizeof(PFILA2));
-		block_join = (PFILA2) malloc(sizeof(PFILA2));
-		block = (PFILA2) malloc(sizeof(PFILA2));
-		
-		CreateFila2(ables);
-		CreateFila2(block_join);
-		CreateFila2(block);
+	TCB_t new_thread;
 
-		thread_main = TCB_create_main();
-		init = 1;    // __init__ thread
-	}
+	/* Check if internal variables was initialized */
+	if(control.init == FALSE)
+		init_lib();
 
-	/* Create a new TCB with enter function */
-	ucontext_t* finish_context = (ucontext_t*) malloc(sizeof(ucontext_t));
+	/* Making thread context */
+	getcontext(&new_thread.context);
+	context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	context->uc_stack.ss_size = SIGSTKSZ;
+	context->uc_link = control.end_thread;
+	makecontext(&new_thread.context, (void (*)(void))start, 1, arg);
 
-	/* __Init__ the data structure for the run flow */
-	getcontext(finish_context);
-	/* Define Stack */
-	finish_context->uc_stack.ss_sp = (char*) malloc(16384); //Stack Size = 16384
-	finish_context->uc_link = NULL;
-	/* Modify the context */
-	makecontext(finish_context, (void (*)(void))EndPoint, 0);
+	/* Changing TCB fields */
+	new_thread.tid = rb_get_max_key(control.all_threads);
+	new_thread.state = PROCST_APTO;
+	new_thread.ticket = new_ticket();
 
-	getcontext(context);
-	context->uc_stack.ss_sp = (char*) malloc(16384);
-	context->uc_stack.ss_size = 16384;
-	context->uc_link = finish_context;
-	makecontext(context, (void (*)(void))start, 1, arg);
-
-	TCB_t* thread = TCB_create(context);
-
-	/* Put ables in the able queue */
-	AppendFila2(ables, (void (*)(void)) thread);
-
+	/* Put into all_treads and able_threads */
+	rb_insert(control.all_threads, new_thread.tid, &new_thread);
+	rb_able_insert(new_thread.tid);
+	
 	/* Return the Thread Identifier*/
 	return thread->tid;
 };
@@ -65,8 +51,6 @@ int csem_init(csem_t *sem, int count){
 };
 
 
-
-
 int cwait(csem_t *sem){
     /* Test count to see if it still has available resources */
 	if(sem->count <= 0){
@@ -80,13 +64,13 @@ int cwait(csem_t *sem){
 	    	getcontext(&running_thread->context);
 	    	dispatcher();
             return 0;
-	    
+
 		}
 		/* No thread was running, so it needs to call dispatcher to swap context */
 		else{
 		    sem->count--;
 		    dispatcher();
-			
+
 		}
 	}
 	/* If it has available resources it needs to decrement count and keep running the thread  */
@@ -115,11 +99,11 @@ int csignal(csem_t *sem){
 		}
 		else{
 		   /* There was no resource to be freed **/
-		   sem->count--; 
+		   sem->count--;
 		   return -1;
 		}
 	}
-	else 
+	else
 	{
 	    /* There was an error going to the first item in the FIFO **/
 	     return -1;
@@ -127,5 +111,3 @@ int csignal(csem_t *sem){
 
 	return 0;
 };
-
-

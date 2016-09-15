@@ -13,6 +13,8 @@
 #define	PROCST_BLOQ	3
 #define	PROCST_TERMINO	4
 
+#define TRUE 1
+#define FALSE 0
 /* NÃO ALTERAR ESSA struct */
 typedef struct s_TCB {
 	int		tid; 		// identificador da thread
@@ -24,21 +26,22 @@ typedef struct s_TCB {
 
 typedef struct _thr_list{
     TCB_t* curr_tcb;
-    int tcb_id;
     struct _thr_list* next;
 }THREAD_LIST;
 
 struct _cth{
-    // Verify if the main thread was initialized
-    bool init;
-    // Tree of all threads
+    /* Verify if the main thread was initialized */
+    int init;
+    /* Tree of all threads */
     RB_BST_TREE* all_threads;
-    // Tree of ablle threads
+    /* Tree of ablle threads */
     RB_BST_TREE* able_threads;
-    // Tree of releaser threads
+    /* Tree of releaser threads */
     RB_BST_TREE* releaser_threads;
-    // Current thread pointer running
+    /* Current thread pointer running */
     TCB_t* running_thread;
+	/* UCP to delete a thread that end */
+	ucontext_t end_thread;
 };
 
 extern struct _cth control;

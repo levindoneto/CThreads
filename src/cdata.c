@@ -1,71 +1,85 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
+
 #include "../include/cthread.h"
 #include "../include/cdata.h"
-#include <stdio.h>
+#include "red_black_tree.h"
 
-int TID_counter = 0;
 
-ucontext_t* allocator_init()
-{
+/*
+	Initialing control variables
+*/
+void init_lib(void){
+	TCB_t main_thread;
+	control.all_threads = rb_init_tree(sizeof(TCB_t), true);
+	control.able_threads = rb_init_tree(sizeof(THREAD_LIST), false);
+	control.releaser_threads = rb_init_tree(sizeof(csem_t), true);
+	control.init = TRUE;
+
+	main_thread.state = PROCST_EXEC;
+	main_thread.tid = 0
+	main_thread.ticket = new_ticket();
+
+	rb_insert(control.all_threads, main_thread.tid, &main_thread);
+
+	getcontext(&control.running_thread);
+	finish_context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	finish_context->uc_link = NULL;
+	makecontext(&control.running_thread, (void (*)(void))ended_thread, 0);
+
+}
+
+void ended_thread(void){
+
+	control->running_thread.state = PROCST_TERMINO;
+
+	/* Verify REALESER_THREADS*/
+	release_verification();
+	
+	dispatcher();
+}
+
+int new_ticket(void){
+	return random2() % 256;
+}
+
+
+ucontext_t* allocator_init(ucontext_t *uc_link, void *(*start)(void *), void *arg){
 	// Alloc memory for the context
 	allocation_context = (ucontext_t*)malloc(sizeof(ucontext_t*));
-	
+
 	// Verify if the allocation was work
 	if (allocation_context == NULL)
 		return NULL;
-	
+
 	// Create the context for the threads output
 	getcontext(allocation_context);
 	// Alloc a stack for the thread for the new context
-	allocation_context->uc_stack.ss_sp = (char*) malloc(16384);
-	allocation_context->uc_stack.ss_size = 16384;
-	allocation_context->uc_link = NULL;
+	allocation_context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	allocation_context->uc_stack.ss_size = SIGSTKSZ;
+	allocation_context->uc_link = uc_link;
 	// Modify the context for allocatation_context
-	makecontext(allocation_context, (void (*)(void))EndPoint, 0);
+	makecontext(allocation_context, (void (*)(void))start, 1, arg);
 
 	return allocation_context;
 }
 
-void* EndPoint()
-{
-	if(FirstFila2(block_join) == 0){
-		join_t* join_t1; // Create a join, that have information about the 
-						 // threads that aren't finished.
-		do{
-			join_t1 = GetAtIteratorFila2(block_join);
-
-			if(join_t1 != NULL)
-				if(run_t->tid == join_t1->wait){
-					join_t1->thread->state = PROCST_APTO;
-					/* Put threads from join in the able queue */
-					AppendFila2(ables, join_t1->thread);
-					/* Remove threads blocked from join */
-					DeleteAtIteratorFila2(blocks_join);
-					break;
-				}
-		}while(NextFila2(blocks_join)==0);
-	}
-
-	free(run_t); // Only free space that was used by a thread in execution
-	dispatcher();
-	return 0;
-}
 
 /* For create a main thread control block for a main*/
 TCB_t* TCB_create_main()
 {
 	TCB_t *thread = TCB_alloc();
-    
+
 	if(thread != NULL)
 	{
 		// Set the TID_counter for tid of thread created
 		thread->tid = TID_counter;
 		// Put thread in the able state
 		thread->state = PROCST_APTO;
-		// For to have a unique TID for each thread		
+		// For to have a unique TID for each thread
 		TID_counter += 1;
 	}
 
@@ -83,7 +97,7 @@ TCB_t* TCB_create(ucontext_t* context)
 		thread->tid = TID_counter;
 		// Put thread in the able state
 		thread->state = PROCST_APTO;
-		// For to have a unique TID for each thread	
+		// For to have a unique TID for each thread
 		TID_counter += 1;
 		// Set the context to the created thread
 		thread->context = *context;
@@ -92,7 +106,10 @@ TCB_t* TCB_create(ucontext_t* context)
 	return thread;
 }
 
-
+/*	REVISAR!!
+		swapcontext talvez não seja a melhor abordagem, já
+		se uma thread termina o contexto é desalocado.
+*/
 void dispatcher(){
     int ticket;
     ticket = random2() % 256; // Discard numbers with more than 255 bits
@@ -106,7 +123,7 @@ void dispatcher(){
         control.running_thread->state = PROCST_APTO;
         running_thread = current_able;
         running_thread->state = PROCST_EXEC;
-        
+
         //setcontext(&runing_thread -> context);   /* Stay here the question */
     }
 }

@@ -117,4 +117,12 @@ void rb_print_tree(RB_BST_TREE* self);
         instance of the tree
 */
 void rb_destroy_tree(RB_BST_TREE* self);
+
+/* ***Get MAX key***
+    Get the biggest key stored in the tree
+    Arguments:
+     1 - RB_BST_TREE* self:
+        instance of the tree
+*/
+int rb_get_key_max(RB_BST_TREE* self);
 #endif
