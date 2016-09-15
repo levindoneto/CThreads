@@ -1,1 +1,8 @@
 # Adicionar caminho dos arquivos que não deseja adicionar no repositório
+./bin/*.o
+./lib/*.a
+
+./bin/*~
+./lib/*~
+./src/*~
+./testes/*~
