@@ -1,13 +1,14 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
-#include "../include/support.h"
-#include "../include/cthread.h"
-#include "../include/cdata.h"
-#include <stdio.h>
 
-control.init = FALSE;
+#include "red_black_tree.h"
+#include "able_threads.h"
+#include "cthread.h"
+#include "support.h"
+#include "cdata.h"
 
 int ccreate (void* (*start)(void*), void *arg){
 	TCB_t new_thread;
@@ -18,23 +19,31 @@ int ccreate (void* (*start)(void*), void *arg){
 
 	/* Making thread context */
 	getcontext(&new_thread.context);
-	context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
-	context->uc_stack.ss_size = SIGSTKSZ;
-	context->uc_link = control.end_thread;
+	new_thread.context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	new_thread.context.uc_stack.ss_size = SIGSTKSZ;
+	new_thread.context.uc_link = &control.ended_thread;
 	makecontext(&new_thread.context, (void (*)(void))start, 1, arg);
 
 	/* Changing TCB fields */
-	new_thread.tid = rb_get_max_key(control.all_threads);
+	new_thread.tid = rb_get_key_max(control.all_threads);
 	new_thread.state = PROCST_APTO;
-	new_thread.ticket = new_ticket();
+	new_thread.ticket = NEW_TICKET;
 
 	/* Put into all_treads and able_threads */
 	rb_insert(control.all_threads, new_thread.tid, &new_thread);
 	rb_able_insert(new_thread.tid);
-	
+
 	/* Return the Thread Identifier*/
-	return thread->tid;
+	return new_thread.tid;
 };
+
+int cyield (void){
+	return FALSE;
+}
+
+int cjoin(int tid){
+	return FALSE;
+}
 
 int csem_init(csem_t *sem, int count){
 	/* Set count of the semaphore variable */
@@ -54,14 +63,14 @@ int csem_init(csem_t *sem, int count){
 int cwait(csem_t *sem){
     /* Test count to see if it still has available resources */
 	if(sem->count <= 0){
-		if(running_thread != NULL){
+		if(control.running_thread != NULL){
 		    /* Put running thread in the semaphore FIFO */
-			AppendFila2(sem->fila, (void *)running_thread);
+			AppendFila2(sem->fila, (void *)control.running_thread);
 			/* Change state to blocked */
-	    	running_thread->state = PROCST_BLOQ;
+	    	control.running_thread->state = PROCST_BLOQ;
 	    	sem->count--;
 	    	/* Saves context in the thread  */
-	    	getcontext(&running_thread->context);
+	    	getcontext(&control.running_thread->context);
 	    	dispatcher();
             return 0;
 
@@ -95,7 +104,7 @@ int csignal(csem_t *sem){
 			/* Change state to 'able' */
 			freeTCB->state = PROCST_APTO;
 			/* Put the thread in the ables queue so it can run again */
-			AppendFila2(ables, freeTCB);
+			rb_able_insert(freeTCB->tid);
 		}
 		else{
 		   /* There was no resource to be freed **/

@@ -1,33 +1,33 @@
-#include "../include/cthread.h"
-#include "../include/cdata.h"
+#include "cthread.h"
+#include "cdata.h"
 #include "red_black_tree.h"
 
 int rb_able_insert(int tid){
-    THREAD_LIST* list_node, this;
+    THREAD_LIST* list_node;
+    THREAD_LIST* this;
     TCB_t* new_thread = NULL;
 
     /* Searching TCB from tid*/
-    new_thread = rb_search(control.all_treads, tid);
+    new_thread = rb_search(control.all_threads, tid);
     if (new_thread == NULL)
         return FALSE;
 
     /* Creating new list node with the TCB with this tib*/
-    list_node = (THREAD_LIST*)malloc(sizeof((THREAD_LIST));
+    list_node = (THREAD_LIST*)malloc(sizeof(THREAD_LIST));
     list_node->curr_tcb = new_thread;
     list_node->next = NULL;
 
     /* Verifing if the new_thread ticket is on tree*/
-    this = rb_search(control.able_threads, new_thread->ticket);
+    this = (THREAD_LIST*)rb_search(control.able_threads, new_thread->ticket);
     /* Ticket isn't on tree*/
     if (this == NULL)
         rb_insert(control.able_threads, new_thread->ticket, list_node);
     /* Ticket is already on tree*/
     else {
         THREAD_LIST* last;
-        key = this->ticket;
         /* Keep tid order in the list*/
         while (this != NULL){
-            if(this->tid > tid)
+            if(this->curr_tcb->tid > tid)
                 break;
             last = this;
             this = this->next;
@@ -53,7 +53,7 @@ int rb_able_delete(int tid, int ticket){
 
     /* Only one list node */
     if (this->next == NULL){
-        rb_delete(control.able_threads, ticket)
+        rb_delete(control.able_threads, ticket);
         free(this);
     }
     /* More than one list node*/
@@ -68,7 +68,7 @@ int rb_able_delete(int tid, int ticket){
         }
         /* First node in the list*/
         if (last == NULL){
-            this->tcb = this->next->tcb;
+            this->curr_tcb = this->next->curr_tcb;
             this->next = this->next->next;
             free(this->next);
         }
@@ -85,6 +85,9 @@ TCB_t* rb_able_search(int ticket){
     RB_BST_TREE* self = control.able_threads;
     RB_BST_NODE* pt = self->root;
     RB_BST_NODE* last = self->nil;
+    TCB_t* node;
+    TCB_t* parent;
+
     int delta_parent, delta_node;
 
     /* Searching for the key*/
@@ -98,23 +101,31 @@ TCB_t* rb_able_search(int ticket){
             break;
     }
     /* Found the ticket on tree*/
-    if (last == pt)
-        return pt->info->curr_tcb;
+    if (last == pt){
+        this = (THREAD_LIST*) pt->info;
+        return (TCB_t*)this->curr_tcb;
+    }
 
     /* Calcuting delta in module*/
     pt = last->parent;
     delta_node = (last->key > ticket) ? (last->key - ticket) : (ticket - last->key);
     delta_parent = (pt->key > ticket) ? (pt->key - ticket) : (ticket - pt->key);
 
+    /* Getting tcb pointers*/
+    this = (THREAD_LIST*) last->info;
+    node = (TCB_t*) this->curr_tcb;
+    this = (THREAD_LIST*) pt->info;
+    parent = (TCB_t*) this->curr_tcb;
+
     if (delta_parent == delta_node){
         /*Searching for smallest tid*/
-        if(pt->info->curr_tcb->tid < last->info->curr_tcb->tid)
-            return pt->info->curr_tcb;
+        if(node->tid < parent->tid)
+            return parent;
         else
-            return last->info->curr_tcb;
+            return node;
     }
     else if (delta_node < delta_parent)
-        return last->info->curr_tcb;
+        return node;
     else
-        return pt->info->curr_tcb;
+        return parent;
 }

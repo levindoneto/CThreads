@@ -7,19 +7,26 @@
 #ifndef __cdata__
 #define __cdata__
 
+#include "red_black_tree.h"
+#include <ucontext.h>
+/* random2*/
+#include "support.h"
+
 #define	PROCST_CRIACAO	0
 #define	PROCST_APTO	1
 #define	PROCST_EXEC	2
 #define	PROCST_BLOQ	3
 #define	PROCST_TERMINO	4
 
+#define NEW_TICKET Random2() % 256
 #define TRUE 1
-#define FALSE 0
+#define FALSE -1
+
 /* NÃO ALTERAR ESSA struct */
 typedef struct s_TCB {
 	int		tid; 		// identificador da thread
 	int		state;		// estado em que a thread se encontra
-					// 0: Criação; 1: Apto; 2: Execução; 3: Bloqueado e 4: Término
+	// 0: Criação; 1: Apto; 2: Execução; 3: Bloqueado e 4: Término
 	int 		ticket;		// "bilhete" de loteria da thread, para uso do escalonador
 	ucontext_t 	context;	// contexto de execu��o da thread (SP, PC, GPRs e recursos)
 } TCB_t;
@@ -41,9 +48,17 @@ struct _cth{
     /* Current thread pointer running */
     TCB_t* running_thread;
 	/* UCP to delete a thread that end */
-	ucontext_t end_thread;
+	ucontext_t ended_thread;
 };
 
-extern struct _cth control;
+#ifndef _CONTROL_DEF_
+#define _CONTROL_DEF_
+extern struct _cth control = {.init = FALSE};
+#endif
 
+/* Function prototypes*/
+void init_lib(void);
+void ended_thread(void);
+void release_verification(void);
+void dispatcher(void);
 #endif
