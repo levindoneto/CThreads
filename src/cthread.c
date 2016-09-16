@@ -10,6 +10,8 @@
 #include "support.h"
 #include "cdata.h"
 
+struct _cth control = {.init = FALSE};
+
 int ccreate (void* (*start)(void*), void *arg){
 	TCB_t new_thread;
 

@@ -53,7 +53,7 @@ struct _cth{
 
 #ifndef _CONTROL_DEF_
 #define _CONTROL_DEF_
-extern struct _cth control = {.init = FALSE};
+extern struct _cth control;
 #endif
 
 /* Function prototypes*/

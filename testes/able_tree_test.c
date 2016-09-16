@@ -9,7 +9,7 @@
 #include "support.h"
 #include "cdata.h"
 
-int ccreate_test (void* (*start)(void*), void *arg, int ticket_test){
+int ccreate_test (void (*start)(void*), void *arg, int ticket_test){
 	TCB_t new_thread;
 
 	/* Check if internal variables was initialized */
@@ -37,7 +37,7 @@ int ccreate_test (void* (*start)(void*), void *arg, int ticket_test){
 };
 
 
-void test(){
+void test(void *arg){
     printf("void test");
 
 }
