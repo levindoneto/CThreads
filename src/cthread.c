@@ -13,30 +13,31 @@
 struct _cth control = {.init = FALSE};
 
 int ccreate (void* (*start)(void*), void *arg){
-	TCB_t new_thread;
+	TCB_t* new_thread;
 
 	/* Check if internal variables was initialized */
 	if(control.init == FALSE)
 		init_lib();
 
 	/* Making thread context */
-	getcontext(&new_thread.context);
-	new_thread.context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
-	new_thread.context.uc_stack.ss_size = SIGSTKSZ;
-	new_thread.context.uc_link = &control.ended_thread;
-	makecontext(&new_thread.context, (void (*)(void))start, 1, arg);
+	new_thread = (TCB_t*) malloc(sizeof(TCB_t));
+	getcontext(&new_thread->context);
+	new_thread->context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	new_thread->context.uc_stack.ss_size = SIGSTKSZ;
+	new_thread->context.uc_link = &control.ended_thread;
+	makecontext(&new_thread->context, (void (*)(void))start, 1, arg);
 
 	/* Changing TCB fields */
-	new_thread.tid = rb_get_key_max(control.all_threads);
-	new_thread.state = PROCST_APTO;
-	new_thread.ticket = NEW_TICKET;
+	new_thread->tid = rb_get_key_max(control.all_threads) + 1;
+	new_thread->state = PROCST_APTO;
+	new_thread->ticket = NEW_TICKET;
 
-	/* Put into all_treads and able_threads */
-	rb_insert(control.all_threads, new_thread.tid, &new_thread);
-	rb_able_insert(new_thread.tid);
+	/* Put it into all_treads and able_threads */
+	rb_insert(control.all_threads, new_thread->tid, new_thread);
+	rb_able_insert(new_thread->tid);
 
 	/* Return the Thread Identifier*/
-	return new_thread.tid;
+	return new_thread->tid;
 };
 
 int cyield (void){

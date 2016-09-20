@@ -11,30 +11,43 @@
 #include "cdata.h"
 
 /*
-	Initialing control variables
+	Init control variables and create main thread
 */
 void init_lib(void){
-	TCB_t main_thread;
-	control.all_threads = rb_init_tree(sizeof(TCB_t), true);
+	TCB_t* main_thread;
+
+	/* Init Tries*/
+	control.all_threads = rb_init_tree(sizeof(TCB_t), false);
 	control.able_threads = rb_init_tree(sizeof(THREAD_LIST), false);
-	control.releaser_threads = rb_init_tree(sizeof(csem_t), true);
+	control.releaser_threads = rb_init_tree(sizeof(csem_t), false);
 	control.init = TRUE;
 
-	main_thread.state = PROCST_EXEC;
-	main_thread.tid = 0;
-	main_thread.ticket = NEW_TICKET;
+	/* Create main thread with TID = 0*/
+	main_thread = (TCB_t*) malloc(sizeof(TCB_t));
+	main_thread->state = PROCST_EXEC;
+	main_thread->tid = 0;
+	main_thread->ticket = NEW_TICKET;
 
-	rb_insert(control.all_threads, main_thread.tid, &main_thread);
+	/* Insert main thread in all_threads*/
+	rb_insert(control.all_threads, main_thread->tid, main_thread);
 
-	getcontext(&control.running_thread->context);
-	control.running_thread->context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
-	control.running_thread->context.uc_link = NULL;
-	makecontext(&control.running_thread->context, (void (*)(void))ended_thread, 0);
+	/* Create end functions to threads*/
+	getcontext(&control.ended_thread);
+	control.ended_thread.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	control.ended_thread.uc_link = NULL;
+	makecontext(&control.ended_thread, (void (*)(void))ended_thread, 0);
 
+	/* Set Main thread as running*/
+	control.running_thread = main_thread;
+
+	/* Create context to main thread*/
+	getcontext(&main_thread->context);
+	main_thread->context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	main_thread->context.uc_link = &control.ended_thread;
 }
 
 void ended_thread(void){
-
+	/* Save context to next callback*/
 	getcontext(&control.ended_thread);
 	control.running_thread->state = PROCST_TERMINO;
 
