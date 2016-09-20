@@ -84,48 +84,73 @@ TCB_t* rb_able_search(int ticket){
     THREAD_LIST* this;
     RB_BST_TREE* self = control.able_threads;
     RB_BST_NODE* pt = self->root;
-    RB_BST_NODE* last = self->nil;
+    RB_BST_NODE* smallest = self->nil;
     TCB_t* node;
-    TCB_t* parent;
 
-    int delta_parent, delta_node;
+    int delta_min, delta;
+
+    /* MAX TICKET*/
+    delta_min = 256;
 
     /* Searching for the key*/
     while (pt != self->nil){
-        last = pt;
-        if (ticket > pt->key)
+        /* Calcute delta between ticket and node key */
+        delta = (pt->key > ticket) ? (pt->key - ticket) : (ticket - pt->key);
+        /* Search for smallest delta*/
+        if (delta < delta_min){
+            delta_min = delta;
+            smallest = pt;
+        }
+        else if (delta == delta_min){
+            int tid_smallest;
+
+            this = (THREAD_LIST*)smallest->info;
+            node = (TCB_t*)this->curr_tcb;
+            tid_smallest = node->tid;
+
+            this = (THREAD_LIST*)pt->info;
+            node = (TCB_t*)this->curr_tcb;
+            /* Search for smallest TID*/
+            if (tid_smallest > node->tid)
+                smallest = pt;
+        }
+        /* Walking through tree*/
+        if (ticket > pt->key){
             pt = pt->right;
+        }
         else if (ticket < pt->key)
             pt = pt->left;
         else
             break;
     }
-    /* Found the ticket on tree*/
-    if (last == pt){
-        this = (THREAD_LIST*) pt->info;
-        return (TCB_t*)this->curr_tcb;
+    this = (THREAD_LIST*)smallest->info;
+    return (TCB_t*)this->curr_tcb;
+}
+
+void rb_able_order_print(RB_BST_TREE* self, RB_BST_NODE* node, int level){
+    THREAD_LIST* list_node;
+    /* Leaf node, returning*/
+    if (node == self->nil)
+        return;
+
+    /* Go to left*/
+    rb_able_order_print(self, node->left, level + 1);
+
+    /* Pass the information of a node for a list node*/
+    list_node = (THREAD_LIST*)node->info;
+
+    printf("%i(%i)[%s]: ", node->key, level, node->color == RED ? "RED": "BLACK");
+    while(list_node != NULL){
+        printf("TID(%i) ", list_node->curr_tcb->tid);
+        list_node = list_node->next;
     }
+    printf("\n");
 
-    /* Calcuting delta in module*/
-    pt = last->parent;
-    delta_node = (last->key > ticket) ? (last->key - ticket) : (ticket - last->key);
-    delta_parent = (pt->key > ticket) ? (pt->key - ticket) : (ticket - pt->key);
+    /* Go to right*/
+    rb_able_order_print(self, node->right, level + 1);
+}
 
-    /* Getting tcb pointers*/
-    this = (THREAD_LIST*) last->info;
-    node = (TCB_t*) this->curr_tcb;
-    this = (THREAD_LIST*) pt->info;
-    parent = (TCB_t*) this->curr_tcb;
-
-    if (delta_parent == delta_node){
-        /*Searching for smallest tid*/
-        if(node->tid < parent->tid)
-            return parent;
-        else
-            return node;
-    }
-    else if (delta_node < delta_parent)
-        return node;
-    else
-        return parent;
+void rb_able_print_tree(RB_BST_TREE* self){
+    printf("-RED BLACK TREE, notation:: KEY(LEVEL)[COLOR]\n");
+    rb_able_order_print(self, self->root, 0);
 }

@@ -8,7 +8,7 @@
 #	ar rcs my_library.a file1.o file2.o
 
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -g
 LIB_DIR=./lib/
 INC_DIR=./include/
 BIN_DIR=./bin/
@@ -30,7 +30,7 @@ $(BIN_DIR)cthread.o: $(SRC_DIR)cthread.c
 $(BIN_DIR)able_threads.o: $(SRC_DIR)able_threads.c
 	$(CC) $(CFLAGS) -c -o $(BIN_DIR)able_threads.o -I$(INC_DIR) $(SRC_DIR)able_threads.c
 
-.PHONY: test_able
+.PHONY: able_tree_tst pull init
 able_tree_tst: all $(BIN_DIR)able_tree_test.o
 	$(CC) $(CFLAGS) $(BIN_DIR)able_tree_test.o $(BIN_DIR)red_black_tree.o\
 	 $(BIN_DIR)cdata.o $(BIN_DIR)cthread.o $(BIN_DIR)able_threads.o\
@@ -38,6 +38,13 @@ able_tree_tst: all $(BIN_DIR)able_tree_test.o
 
 $(BIN_DIR)able_tree_test.o: $(TST_DIR)able_tree_test.c
 	 $(CC) $(CFLAGS) -c -o $(BIN_DIR)able_tree_test.o -I$(INC_DIR) $(TST_DIR)able_tree_test.c
+
+# VM RULES
+init:
+	@sudo mount -t vboxsf -o uid=1000 cthreads /home/aluno/Share/
+
+pull:
+	@rm -r ./* && cp -r ~/Share/* ./
 
 # Copy of support.o because it's removed in clean up process
 clean:

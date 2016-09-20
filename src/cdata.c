@@ -33,8 +33,9 @@ void init_lib(void){
 
 	/* Create end functions to threads*/
 	getcontext(&control.ended_thread);
-	control.ended_thread.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
 	control.ended_thread.uc_link = NULL;
+	control.ended_thread.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	control.ended_thread.uc_stack.ss_size = SIGSTKSZ;
 	makecontext(&control.ended_thread, (void (*)(void))ended_thread, 0);
 
 	/* Set Main thread as running*/
@@ -42,8 +43,10 @@ void init_lib(void){
 
 	/* Create context to main thread*/
 	getcontext(&main_thread->context);
-	main_thread->context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
 	main_thread->context.uc_link = &control.ended_thread;
+	main_thread->context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+	main_thread->context.uc_stack.ss_size = SIGSTKSZ;
+
 }
 
 void ended_thread(void){
