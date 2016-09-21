@@ -23,7 +23,7 @@ void init_lib(void){
 	control.init = TRUE;
 
 	/* Create main thread with TID = 0*/
-	main_thread = (TCB_t*) malloc(sizeof(TCB_t));
+	main_thread = (TCB_t*)malloc(sizeof(TCB_t));
 	main_thread->state = PROCST_EXEC;
 	main_thread->tid = 0;
 	main_thread->ticket = NEW_TICKET;
@@ -52,39 +52,68 @@ void init_lib(void){
 void ended_thread(void){
 	/* Save context to next callback*/
 	getcontext(&control.ended_thread);
-	control.running_thread->state = PROCST_TERMINO;
 
 	/* Verify REALESER_THREADS*/
 	release_verification();
+
+	control.running_thread->state = PROCST_TERMINO;
 
 	/* */
 	dispatcher();
 }
 
 void release_verification(void){
-	return;
+	csem_t* sem;
+
+	/* Search for running_thread in releaser threads*/
+	sem = (csem_t*)rb_search(control.releaser_threads, control.running_thread->tid);
+
+	/* No thread need this*/
+	if (sem == NULL)
+		return;
+	/* Unblock thread blocked by cjoin*/
+	csignal(sem);
+
+	/* Remover releaser thread*/
+	rb_delete(control.releaser_threads, control.running_thread->tid);
+	free(sem);
 }
 
-/*	REVISAR!!
-		swapcontext talvez não seja a melhor abordagem, já
-		se uma thread termina o contexto é desalocado.
-*/
 void dispatcher(){
-	/*
-    int ticket;
-    ticket = random2() % 256; // Discard numbers with more than 255 bits
-    TCB_t *current_able;
-    //TODO search will be modified to return the closest number to the node that you are looking for
-    current_able = rb_able_search(control.able_threads,ticket);
-    if (swapcontext(&control.running_thread->context, &current_able->context) == -1){
-        printf("Error swapping");
-    }
-    else{
-        control.running_thread->state = PROCST_APTO;
-        running_thread = current_able;
-        running_thread->state = PROCST_EXEC;
+	TCB_t* next_thread;
+	TCB_t* current_thread = control.running_thread;
+    int raffle;
 
-        //setcontext(&runing_thread -> context);
+	/* Raffle a ticket*/
+    raffle = NEW_TICKET;
+	/* Search for thread winner*/
+    next_thread = rb_able_search(raffle);
+	/* Remove next thread from able threads tree*/
+	rb_able_delete(next_thread->tid, raffle);
+	/* Set as running_thread*/
+	next_thread->state = PROCST_EXEC;
+	control.running_thread = next_thread;
+
+	/* Old running thread must be inserted in able threads tree*/
+	if (current_thread->state == PROCST_EXEC){
+		/* Set state of old running thread as APTO and add to able threads*/
+		current_thread->state = PROCST_APTO;
+		rb_able_insert(current_thread->ticket);
+		/* Swapping context to new thread*/
+		swapcontext(&current_thread->context, &next_thread->context);
 	}
-	*/
+	/* Old running thread must be blocked*/
+	else if (current_thread->state == PROCST_BLOQ){
+		/* Swapping context to new thread*/
+		swapcontext(&current_thread->context, &next_thread->context);
+	}
+	/* Running Thread must be deleted*/
+	else if (current_thread->state == PROCST_TERMINO){
+		/* Remove running thread from list of all threads*/
+		rb_delete(control.all_threads, current_thread->tid);
+		/* Free TCB memory of old running thread*/
+		free(current_thread);
+		/* Swapping context to new thread*/
+		swapcontext(&current_thread->context, &next_thread->context);
+	}
 }

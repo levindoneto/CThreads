@@ -39,11 +39,12 @@ int ccreate_test (void* (*start)(void*), void *arg, int ticket_test){
 
 void* test(void *arg){
     printf("void test");
+	return NULL;
 }
 
 int main(){
 	TCB_t* raffle;
-    // Test insert at tree	
+    // Test insert at tree
     ccreate_test(test, NULL, 10);
 	ccreate_test(test, NULL, 5);
 	ccreate_test(test, NULL, 6);
@@ -77,16 +78,16 @@ int main(){
 
     // Test search at RB tree with ticket
     printf("Test search of tid %d\n", 8);
-    //raffle = (TCB_t*)rb_search(control.all_threads, 8);	
-    
+    //raffle = (TCB_t*)rb_search(control.all_threads, 8);
+
     // Test delete at tree with only TID passed
     printf("The tid %d was deleted\n", 8);
     rb_able_delete_withTID(8);
-    
+
     // Print tree
     printf("Tree updated:\n");
     rb_able_print_tree(control.able_threads);
-    printf("\n");	
-    
+    printf("\n");
+
 return 0;
 }

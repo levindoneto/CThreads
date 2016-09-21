@@ -19,7 +19,7 @@
 #define	PROCST_TERMINO	4
 
 #define NEW_TICKET Random2() % 256
-#define TRUE 1
+#define TRUE 0
 #define FALSE -1
 
 /* NÃO ALTERAR ESSA struct */
@@ -51,10 +51,7 @@ struct _cth{
 	ucontext_t ended_thread;
 };
 
-#ifndef _CONTROL_DEF_
-#define _CONTROL_DEF_
 extern struct _cth control;
-#endif
 
 /* Function prototypes*/
 void init_lib(void);
