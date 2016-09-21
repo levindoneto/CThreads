@@ -30,14 +30,26 @@ $(BIN_DIR)cthread.o: $(SRC_DIR)cthread.c
 $(BIN_DIR)able_threads.o: $(SRC_DIR)able_threads.c
 	$(CC) $(CFLAGS) -c -o $(BIN_DIR)able_threads.o -I$(INC_DIR) $(SRC_DIR)able_threads.c
 
-.PHONY: able_tree_tst pull init
+.PHONY: able_tree_tst pull init semaphore_test
 able_tree_tst: all $(BIN_DIR)able_tree_test.o
-	$(CC) $(CFLAGS) $(BIN_DIR)able_tree_test.o $(BIN_DIR)red_black_tree.o\
+	 $(CC) $(CFLAGS) $(BIN_DIR)able_tree_test.o $(BIN_DIR)red_black_tree.o\
 	 $(BIN_DIR)cdata.o $(BIN_DIR)cthread.o $(BIN_DIR)able_threads.o\
 	 $(BIN_DIR)support.o -o test_1
 
-$(BIN_DIR)able_tree_test.o: $(TST_DIR)able_tree_test.c
+	 $(BIN_DIR)able_tree_test.o: $(TST_DIR)able_tree_test.c
 	 $(CC) $(CFLAGS) -c -o $(BIN_DIR)able_tree_test.o -I$(INC_DIR) $(TST_DIR)able_tree_test.c
+
+
+semaphore_test: all $(BIN_DIR)semaphore_test.o
+	 $(CC) $(CFLAGS) $(BIN_DIR)semaphore_test.o $(BIN_DIR)red_black_tree.o\
+	 $(BIN_DIR)cdata.o $(BIN_DIR)cthread.o $(BIN_DIR)able_threads.o\
+	 $(BIN_DIR)support.o -o test_1
+
+$(BIN_DIR)semaphore_test.o: $(TST_DIR)semaphore_test.c
+	 $(CC) $(CFLAGS) -c -o $(BIN_DIR)semaphore_test.o -I$(INC_DIR) $(TST_DIR)semaphore_test.c
+
+
+
 
 # VM RULES
 init:
