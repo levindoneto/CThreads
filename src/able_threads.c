@@ -80,6 +80,45 @@ int rb_able_delete(int tid, int ticket){
     return TRUE;
 }
 
+int rb_able_delete_withTID(int tid){
+    THREAD_LIST* this;
+    TCB_t* ticket_by_tid;  // This saves the ticket given a tid
+
+    // Search for the ticket
+    ticket_by_tid = (TCB_t*)rb_search(control.all_threads, tid);	
+
+    this = rb_search(control.able_threads, ticket_by_tid->ticket);
+    if (this == NULL)
+        return FALSE;
+
+    if (this->next == NULL){
+        rb_delete(control.able_threads, ticket_by_tid->ticket);
+        free(this);
+    }
+
+    else{
+        THREAD_LIST* last = NULL;
+        /* Searching for the TID in list*/
+        while (this != NULL){
+            if (this->curr_tcb->tid == tid)
+                break;
+            last = this;
+            this = this->next;
+        }
+        /* First node in the list*/
+        if (last == NULL){
+            this->curr_tcb = this->next->curr_tcb;
+            this->next = this->next->next;
+            free(this->next);
+        }
+        else{
+            last->next = this->next;
+            free(this);
+        }
+    }
+    return TRUE;
+}
+
 TCB_t* rb_able_search(int ticket){
     THREAD_LIST* this;
     RB_BST_TREE* self = control.able_threads;
