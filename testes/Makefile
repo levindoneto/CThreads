@@ -17,5 +17,8 @@ semaphore: semaphore.c $(LIB_DIR)libcthread.a
 threads: threads.c $(LIB_DIR)libcthread.a
 	$(CC) -o threads.out threads.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
 
+identify: identify.c $(LIB_DIR)libcthread.a
+	$(CC) -o identify.out identify.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
+
 clean:
 	rm -r *.out
