@@ -82,7 +82,7 @@ int main(){
 
     // Test delete at tree with only TID passed
     printf("The tid %d was deleted\n", 8);
-    rb_able_delete_withTID(8);
+    rb_able_delete(8);
 
     // Print tree
     printf("Tree updated:\n");

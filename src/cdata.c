@@ -98,11 +98,16 @@ void dispatcher(){
 		next_thread = current_thread;
 	else{
 		/* Remove next thread from able threads tree*/
-		rb_able_delete(next_thread->tid, raffle);
+		rb_able_delete(next_thread->tid);
 		/* Set as running_thread*/
 		next_thread->state = PROCST_EXEC;
 		control.running_thread = next_thread;
 	}
+
+	printf("\n**DISPATCHER** NEXT TID:%d\n", next_thread->tid);
+	printf("ABLE THREADS:");
+	rb_able_print_tree(control.able_threads);
+	printf("\n");
 
 	/* Old running thread must be inserted in able threads tree*/
 	if (current_thread->state == PROCST_EXEC){

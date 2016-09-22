@@ -45,7 +45,7 @@ int rb_able_insert(int tid){
     return true;
 }
 
-int rb_able_delete(int tid, int ticket){
+int rb_able_delete_ticket(int tid, int ticket){
     THREAD_LIST* this;
 
     this = rb_search(control.able_threads, ticket);
@@ -81,7 +81,7 @@ int rb_able_delete(int tid, int ticket){
     return TRUE;
 }
 
-int rb_able_delete_withTID(int tid){
+int rb_able_delete(int tid){
     THREAD_LIST* this;
     TCB_t* ticket_by_tid;  // This saves the ticket given a tid
 

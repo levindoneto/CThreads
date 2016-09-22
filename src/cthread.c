@@ -44,8 +44,6 @@ int ccreate(void* (*start)(void*), void *arg){
 };
 
 int cyield(void){
-	/* Verify REALESER_THREADS*/
-	release_verification();
 	dispatcher();
 	return TRUE;
 }
@@ -60,7 +58,7 @@ int cjoin(int tid){
 	if (rb_search(control.all_threads, tid) == NULL)
 		return FALSE;
 	/* Test if other thread was waiting for this tid thread*/
-	if (rb_search(control.releaser_threads, tid) == NULL)
+	if (rb_search(control.releaser_threads, tid) != NULL)
 		return FALSE;
 
 	/* Create Semaphore to block running_thread*/
@@ -139,9 +137,9 @@ int csignal(csem_t *sem){
 };
 
 int cidentify(char *name, int size){
-	char* str ="Béuren Felipe Bechlin (00230321)\n\
-				Eduardo Stein Brito (00243657)\n\
-				Levindo Gabriel Taschetto Neto (00243685)\n";
+	char* str ="\tBéuren Felipe Bechlin\t\t(00230321)\n\
+\tEduardo Stein Brito\t\t(00243657)\n\
+\tLevindo Gabriel Taschetto Neto\t(00243685)\n";
 	memcpy(name, str, size);
 	return TRUE;
 }
