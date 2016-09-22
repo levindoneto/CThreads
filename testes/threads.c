@@ -34,6 +34,7 @@ void* thread_1(void *arg){
     printf("ABLE THREADS\n");
     rb_able_print_tree(control.able_threads);
     cyield();
+    printf("->>THREAD 1:\n RUNNING THREAD TID: %d\n", control.running_thread->tid);
     printf("RELEASER THREADS\n");
     rb_print_tree(control.releaser_threads);
 /*

@@ -12,6 +12,8 @@
 /* random2*/
 #include "support.h"
 
+#define DEBUG TRUE
+
 #define	PROCST_CRIACAO	0
 #define	PROCST_APTO	1
 #define	PROCST_EXEC	2

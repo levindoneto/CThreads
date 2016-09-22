@@ -46,7 +46,6 @@ void init_lib(void){
 	main_thread->context.uc_link = &control.ended_thread;
 	main_thread->context.uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
 	main_thread->context.uc_stack.ss_size = SIGSTKSZ;
-
 }
 
 void ended_thread(void){
@@ -57,6 +56,11 @@ void ended_thread(void){
 	release_verification();
 
 	control.running_thread->state = PROCST_TERMINO;
+	#if DEBUG == TRUE
+	printf("\n########END#OF#THREAD######\n");
+	printf("TID: %i \n",control.running_thread->tid);
+	printf("###########################\n\n");
+	#endif
 	dispatcher();
 
 	/* Verify if exists no more threads*/
@@ -64,7 +68,11 @@ void ended_thread(void){
 		rb_destroy_tree(control.all_threads);
 		rb_destroy_tree(control.able_threads);
 		rb_destroy_tree(control.releaser_threads);
+		#if DEBUG == TRUE
+		printf("\n---END OF LIBRARY.\n\n");
+		#endif
 	}
+
 }
 
 void release_verification(void){
@@ -79,6 +87,13 @@ void release_verification(void){
 	/* Unblock thread blocked by cjoin*/
 	csignal(sem);
 
+	/* Debug prints*/
+	#if DEBUG == TRUE
+	printf("\n---------RELEASE----------\n");
+	printf(" ABLE THREADS:\n");
+	rb_able_print_tree(control.able_threads);
+	printf("---------------------------\n\n");
+	#endif
 	/* Remover releaser thread*/
 	rb_delete(control.releaser_threads, control.running_thread->tid);
 	free(sem);
@@ -103,11 +118,11 @@ void dispatcher(){
 		next_thread->state = PROCST_EXEC;
 		control.running_thread = next_thread;
 	}
-
-	printf("\n**DISPATCHER** NEXT TID:%d\n", next_thread->tid);
-	printf("ABLE THREADS:");
-	rb_able_print_tree(control.able_threads);
-	printf("\n");
+	/* Debug prints*/
+	#if DEBUG == TRUE
+	printf("\n*********DISPATCHER********\n");
+	printf(" NEXT TID: %d RAFFLED: %d\n", next_thread->tid, raffle);
+	#endif
 
 	/* Old running thread must be inserted in able threads tree*/
 	if (current_thread->state == PROCST_EXEC){
@@ -115,13 +130,26 @@ void dispatcher(){
 		if (next_thread != current_thread){
 			/* Set state of old running thread as APTO and add to able threads*/
 			current_thread->state = PROCST_APTO;
-			rb_able_insert(current_thread->ticket);
+			rb_able_insert(current_thread->tid);
+			/* Debug prints*/
+			#if DEBUG == TRUE
+			printf("ABLE THREADS:\n");
+			rb_able_print_tree(control.able_threads);
+			printf("***************************\n\n");
+			#endif
+
 			/* Swapping context to new thread*/
 			swapcontext(&current_thread->context, &next_thread->context);
 		}
 	}
 	/* Old running thread must be blocked*/
 	else if (current_thread->state == PROCST_BLOQ){
+		/* Debug prints*/
+		#if DEBUG == TRUE
+		printf("REALESER THREADS:\n");
+		rb_print_tree(control.releaser_threads);
+		printf("***************************\n\n");
+		#endif
 		/* Swapping context to new thread*/
 		swapcontext(&current_thread->context, &next_thread->context);
 	}
@@ -129,6 +157,12 @@ void dispatcher(){
 	else if (current_thread->state == PROCST_TERMINO){
 		/* Remove running thread from list of all threads*/
 		rb_delete(control.all_threads, current_thread->tid);
+		/* Debug prints*/
+		#if DEBUG == TRUE
+		printf("ALL THREADS:\n");
+		rb_print_tree(control.all_threads);
+		printf("***************************\n\n");
+		#endif
 		/* Free TCB memory of old running thread*/
 		free(current_thread->context.uc_stack.ss_sp);
 		free(current_thread);

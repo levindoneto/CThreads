@@ -83,8 +83,10 @@ int main(){
     // Test delete at tree with only TID passed
     printf("The tid %d was deleted\n", 8);
     rb_able_delete(8);
+	rb_able_print_tree(control.able_threads);
 
     // Print tree
+	rb_able_insert(8);
     printf("Tree updated:\n");
     rb_able_print_tree(control.able_threads);
     printf("\n");
