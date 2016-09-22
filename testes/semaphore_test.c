@@ -16,8 +16,6 @@ void* test(void *args){
 int main() {
     //TCB_t* thread_t;    
     csem_t test_sem; //Go to the stack, without malloc/free
-    test_sem.count = 1;
-
     int count_test=1;
     int t_s, t_w, tid_t;    // Returns
     
@@ -28,7 +26,6 @@ int main() {
     // Test of csem_init (csem_init is working)
     t_s = csem_init(&test_sem, count_test);
     printf("\tReturn of csem_init: %d\n", t_s);
-    printf("\tSemaphore variable: %d\n", test_sem); // Have a warning, because there is a (int)pointer being printed
     printf("\tCount_test: %d\n\n", count_test);    
 
     printf("Test cwait:\n");
