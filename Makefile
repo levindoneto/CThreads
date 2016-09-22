@@ -36,26 +36,24 @@ able_tree_tst: all $(BIN_DIR)able_tree_test.o
 	 $(BIN_DIR)cdata.o $(BIN_DIR)cthread.o $(BIN_DIR)able_threads.o\
 	 $(BIN_DIR)support.o -o test_1
 
-	 $(BIN_DIR)able_tree_test.o: $(TST_DIR)able_tree_test.c
+$(BIN_DIR)able_tree_test.o: $(TST_DIR)able_tree_test.c
 	 $(CC) $(CFLAGS) -c -o $(BIN_DIR)able_tree_test.o -I$(INC_DIR) $(TST_DIR)able_tree_test.c
 
 
 semaphore_test: all $(BIN_DIR)semaphore_test.o
 	 $(CC) $(CFLAGS) $(BIN_DIR)semaphore_test.o $(BIN_DIR)red_black_tree.o\
 	 $(BIN_DIR)cdata.o $(BIN_DIR)cthread.o $(BIN_DIR)able_threads.o\
-	 $(BIN_DIR)support.o -o test_1
+	 $(BIN_DIR)support.o -o test_2
 
 $(BIN_DIR)semaphore_test.o: $(TST_DIR)semaphore_test.c
 	 $(CC) $(CFLAGS) -c -o $(BIN_DIR)semaphore_test.o -I$(INC_DIR) $(TST_DIR)semaphore_test.c
-
-
 
 
 # VM RULES
 init:
 	@sudo mount -t vboxsf -o uid=1000 cthreads /home/aluno/Share/
 
-pull:
+pull: init
 	@rm -r ./* && cp -r ~/Share/* ./
 
 # Copy of support.o because it's removed in clean up process

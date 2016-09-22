@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include "cthread.h"
 #include "cdata.h"
 #include "red_black_tree.h"
@@ -10,7 +11,7 @@ int rb_able_insert(int tid){
     /* Searching TCB from tid*/
     new_thread = rb_search(control.all_threads, tid);
     if (new_thread == NULL)
-        return FALSE;
+        return false;
 
     /* Creating new list node with the TCB with this tib*/
     list_node = (THREAD_LIST*)malloc(sizeof(THREAD_LIST));
@@ -41,7 +42,7 @@ int rb_able_insert(int tid){
             list_node->next = this;
         }
     }
-    return TRUE;
+    return true;
 }
 
 int rb_able_delete(int tid, int ticket){
@@ -85,7 +86,7 @@ int rb_able_delete_withTID(int tid){
     TCB_t* ticket_by_tid;  // This saves the ticket given a tid
 
     // Search for the ticket
-    ticket_by_tid = (TCB_t*)rb_search(control.all_threads, tid);	
+    ticket_by_tid = (TCB_t*)rb_search(control.all_threads, tid);
 
     this = rb_search(control.able_threads, ticket_by_tid->ticket);
     if (this == NULL)
@@ -127,6 +128,10 @@ TCB_t* rb_able_search(int ticket){
     TCB_t* node;
 
     int delta_min, delta;
+
+    /* Empty Tree*/
+    if (self->root == self->nil)
+        return NULL;
 
     /* MAX TICKET*/
     delta_min = 256;

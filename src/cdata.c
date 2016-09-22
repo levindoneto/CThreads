@@ -57,9 +57,14 @@ void ended_thread(void){
 	release_verification();
 
 	control.running_thread->state = PROCST_TERMINO;
-
-	/* */
 	dispatcher();
+
+	/* Verify if exists no more threads*/
+	if (control.all_threads->root == control.all_threads->nil){
+		rb_destroy_tree(control.all_threads);
+		rb_destroy_tree(control.able_threads);
+		rb_destroy_tree(control.releaser_threads);
+	}
 }
 
 void release_verification(void){
@@ -88,19 +93,27 @@ void dispatcher(){
     raffle = NEW_TICKET;
 	/* Search for thread winner*/
     next_thread = rb_able_search(raffle);
-	/* Remove next thread from able threads tree*/
-	rb_able_delete(next_thread->tid, raffle);
-	/* Set as running_thread*/
-	next_thread->state = PROCST_EXEC;
-	control.running_thread = next_thread;
+	/* No thread in able threads*/
+	if (next_thread == NULL)
+		next_thread = current_thread;
+	else{
+		/* Remove next thread from able threads tree*/
+		rb_able_delete(next_thread->tid, raffle);
+		/* Set as running_thread*/
+		next_thread->state = PROCST_EXEC;
+		control.running_thread = next_thread;
+	}
 
 	/* Old running thread must be inserted in able threads tree*/
 	if (current_thread->state == PROCST_EXEC){
-		/* Set state of old running thread as APTO and add to able threads*/
-		current_thread->state = PROCST_APTO;
-		rb_able_insert(current_thread->ticket);
-		/* Swapping context to new thread*/
-		swapcontext(&current_thread->context, &next_thread->context);
+		/* If the next thread are the running thread do nothing*/
+		if (next_thread != current_thread){
+			/* Set state of old running thread as APTO and add to able threads*/
+			current_thread->state = PROCST_APTO;
+			rb_able_insert(current_thread->ticket);
+			/* Swapping context to new thread*/
+			swapcontext(&current_thread->context, &next_thread->context);
+		}
 	}
 	/* Old running thread must be blocked*/
 	else if (current_thread->state == PROCST_BLOQ){
@@ -112,8 +125,10 @@ void dispatcher(){
 		/* Remove running thread from list of all threads*/
 		rb_delete(control.all_threads, current_thread->tid);
 		/* Free TCB memory of old running thread*/
+		free(current_thread->context.uc_stack.ss_sp);
 		free(current_thread);
-		/* Swapping context to new thread*/
-		swapcontext(&current_thread->context, &next_thread->context);
+		/* If the next thread are the running thread do nothing*/
+		if (next_thread != current_thread)
+			setcontext(&next_thread->context);
 	}
 }
