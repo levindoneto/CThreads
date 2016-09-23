@@ -56,6 +56,16 @@ int main() {
     csignal(&test_sem);
     printf("\tV(s) -> Updated count_test:: %d\n", test_sem.count);
     csignal(&test_sem);
+    /* Test CSignal even with no threads in semaphore FIFO */
+    printf("\n@TEST with no threads in semaphore's FIFO:\n");
+    printf("\tV(s) -> Updated count_test:: %d\n", test_sem.count);
+    csignal(&test_sem);
+    printf("\tV(s) -> Updated count_test:: %d\n", test_sem.count);
+    csignal(&test_sem);
+    printf("\tV(s) -> Updated count_test:: %d\n", test_sem.count);
+    csignal(&test_sem);
+    printf("\tV(s) -> Updated count_test:: %d\n", test_sem.count);
+    csignal(&test_sem);
 
 return 0;
 }
