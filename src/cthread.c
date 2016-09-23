@@ -141,5 +141,6 @@ int cidentify(char *name, int size){
 \tEduardo Stein Brito\t\t(00243657)\n\
 \tLevindo Gabriel Taschetto Neto\t(00243685)\n";
 	memcpy(name, str, size);
+	str[size-1] = '\0';
 	return TRUE;
 }

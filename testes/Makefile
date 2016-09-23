@@ -20,5 +20,8 @@ threads: threads.c $(LIB_DIR)libcthread.a
 identify: identify.c $(LIB_DIR)libcthread.a
 	$(CC) -o identify.out identify.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
 
+stress_test: stress_test.c $(LIB_DIR)libcthread.a
+	$(CC) -o stress_test.out stress_test.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
+
 clean:
 	rm -r *.out
