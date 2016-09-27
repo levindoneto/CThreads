@@ -12,7 +12,7 @@
 /* random2*/
 #include "support.h"
 
-#define DEBUG TRUE
+#define DEBUG FALSE
 
 #define	PROCST_CRIACAO	0
 #define	PROCST_APTO	1
@@ -20,7 +20,12 @@
 #define	PROCST_BLOQ	3
 #define	PROCST_TERMINO	4
 
+#if DEBUG == TRUE
+#define NEW_TICKET Random2() % 100
+#else
 #define NEW_TICKET Random2() % 256
+#endif
+
 #define TRUE 0
 #define FALSE -1
 
@@ -60,4 +65,5 @@ void init_lib(void);
 void ended_thread(void);
 void release_verification(void);
 void dispatcher(void);
+void cclean(void);
 #endif

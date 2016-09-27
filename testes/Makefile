@@ -1,12 +1,12 @@
 #
-# Makefile para programas exemplo
+# Makefile to tests progrms
 #
 
 CC=gcc
 LIB_DIR=../lib/
 INC_DIR=../include/
 
-all: able_tree semaphore threads
+all: able_tree semaphore threads identify threads_stress
 
 able_tree: able_tree.c $(LIB_DIR)libcthread.a
 	$(CC) -o able_tree.out able_tree.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
@@ -20,8 +20,8 @@ threads: threads.c $(LIB_DIR)libcthread.a
 identify: identify.c $(LIB_DIR)libcthread.a
 	$(CC) -o identify.out identify.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
 
-stress_test: stress_test.c $(LIB_DIR)libcthread.a
-	$(CC) -o stress_test.out stress_test.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
+threads_stress: threads_stress.c $(LIB_DIR)libcthread.a
+	$(CC) -o threads_stress.out threads_stress.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
 
 clean:
 	rm -r *.out

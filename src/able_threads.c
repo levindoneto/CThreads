@@ -88,6 +88,9 @@ int rb_able_delete(int tid){
     // Search for the ticket
     ticket_by_tid = (TCB_t*)rb_search(control.all_threads, tid);
 
+    if (ticket_by_tid == NULL)
+        return FALSE;
+
     this = rb_search(control.able_threads, ticket_by_tid->ticket);
     if (this == NULL)
         return FALSE;
@@ -108,9 +111,11 @@ int rb_able_delete(int tid){
         }
         /* First node in the list*/
         if (last == NULL){
+            THREAD_LIST* to_free = this->next;
+
             this->curr_tcb = this->next->curr_tcb;
             this->next = this->next->next;
-            free(this->next);
+            free(to_free);
         }
         else{
             last->next = this->next;

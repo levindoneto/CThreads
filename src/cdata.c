@@ -65,9 +65,7 @@ void ended_thread(void){
 
 	/* Verify if exists no more threads*/
 	if (control.all_threads->root == control.all_threads->nil){
-		rb_destroy_tree(control.all_threads);
-		rb_destroy_tree(control.able_threads);
-		rb_destroy_tree(control.releaser_threads);
+		cclean();
 		#if DEBUG == TRUE
 		printf("\n---END OF LIBRARY.\n\n");
 		#endif
@@ -170,4 +168,10 @@ void dispatcher(){
 		if (next_thread != current_thread)
 			setcontext(&next_thread->context);
 	}
+}
+
+void cclean(void){
+	rb_destroy_tree(control.all_threads);
+	rb_destroy_tree(control.releaser_threads);
+	rb_destroy_tree(control.able_threads);
 }

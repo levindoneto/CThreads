@@ -44,12 +44,21 @@ int ccreate(void* (*start)(void*), void *arg){
 };
 
 int cyield(void){
+
+	/* Check if internal variables was initialized */
+	if(control.init == FALSE)
+		init_lib();
+
 	dispatcher();
 	return TRUE;
 }
 
 int cjoin(int tid){
 	csem_t* block;
+
+	/* Check if internal variables was initialized */
+	if(control.init == FALSE)
+		init_lib();
 
 	/* Test if tid thread is the running_thread*/
 	if (tid == control.running_thread->tid)
@@ -73,6 +82,7 @@ int cjoin(int tid){
 }
 
 int csem_init(csem_t *sem, int count){
+
 	/* Check if internal variables was initialized */
 	if(control.init == FALSE)
 		init_lib();
@@ -91,7 +101,12 @@ int csem_init(csem_t *sem, int count){
 };
 
 int cwait(csem_t *sem){
-    /* Test count to see if it still has available resources */
+
+	/* Check if internal variables was initialized */
+	if(control.init == FALSE)
+		init_lib();
+
+	/* Test count to see if it still has available resources */
 	if(sem->count <= 0){
 	    /* Put running thread in the semaphore FIFO */
 		AppendFila2(sem->fila, (void *)control.running_thread);
@@ -108,7 +123,12 @@ int cwait(csem_t *sem){
 };
 
 int csignal(csem_t *sem){
-    /* Increments count to free resources*/
+
+	/* Check if internal variables was initialized */
+	if(control.init == FALSE)
+		init_lib();
+
+	/* Increments count to free resources*/
 	sem->count++;
 	/* Goes to the first item in the FIFO*/
 	if(FirstFila2(sem->fila) == 0){
@@ -140,7 +160,15 @@ int cidentify(char *name, int size){
 	char* str ="\tBéuren Felipe Bechlin\t\t(00230321)\n\
 \tEduardo Stein Brito\t\t(00243657)\n\
 \tLevindo Gabriel Taschetto Neto\t(00243685)\n";
+
+	/* Check if internal variables was initialized */
+	if(control.init == FALSE)
+		init_lib();
+
 	memcpy(name, str, size);
-	str[size-1] = '\0';
+	if (size == 0)
+		name[0] = '\0';
+	else
+		name[size-1] = '\0';
 	return TRUE;
 }

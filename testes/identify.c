@@ -12,6 +12,8 @@ int main(){
     char test[200];
     int num;
     num = 0;
+    cjoin(0);
+    cyield();
     cidentify(test,num);
     printf("\nPrinting with %d characters ->\n %s",num,test);
     num = 10;
@@ -29,5 +31,7 @@ int main(){
     num = 200;
     cidentify(test,num);
     printf("\nPrinting with %d characters ->\n %s",num,test);
+
+    cclean();
     return 0;
 }

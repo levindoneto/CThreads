@@ -33,6 +33,7 @@ $(BIN_DIR)able_threads.o: $(SRC_DIR)able_threads.c
 	$(CC) $(CFLAGS) -c -o $(BIN_DIR)able_threads.o -I$(INC_DIR) $(SRC_DIR)able_threads.c
 
 # VM RULES
+.PHONY: init pull 
 init:
 	@sudo mount -t vboxsf -o uid=1000 cthreads /home/aluno/Share/
 
@@ -43,6 +44,3 @@ pull: init
 clean:
 	rm -rf $(BIN_DIR)*.o $(SRC_DIR)*~ $(INC_DIR)*~ $(LIB_DIR)*.a *~ && \
 	cp ./resources/support.o $(BIN_DIR)support.o
-
-threads: all $(TST_DIR)threads.c $(LIB_DIR)libcthread.a
-	$(CC) -o threads.out $(TST_DIR)threads.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall

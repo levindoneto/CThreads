@@ -67,5 +67,6 @@ int main() {
     printf("\tV(s) -> Updated count_test:: %d\n", test_sem.count);
     csignal(&test_sem);
 
-return 0;
+    cclean();
+    return 0;
 }
