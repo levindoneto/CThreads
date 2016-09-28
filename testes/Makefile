@@ -23,5 +23,8 @@ identify: identify.c $(LIB_DIR)libcthread.a
 threads_stress: threads_stress.c $(LIB_DIR)libcthread.a
 	$(CC) -o threads_stress.out threads_stress.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall
 
+semaphore_stress: semaphore_stress.c $(LIB_DIR)libcthread.a
+	$(CC) -o semaphore_stress.out semaphore_stress.c -I$(INC_DIR) -L$(LIB_DIR) -lcthread -Wall	
+	
 clean:
 	rm -r *.out
