@@ -20,11 +20,7 @@
 #define	PROCST_BLOQ	3
 #define	PROCST_TERMINO	4
 
-#if DEBUG == TRUE
-#define NEW_TICKET Random2() % 100
-#else
 #define NEW_TICKET Random2() % 256
-#endif
 
 #define TRUE 0
 #define FALSE -1

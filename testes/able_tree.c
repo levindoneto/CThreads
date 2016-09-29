@@ -11,7 +11,7 @@ void* test(void* arg){
     return NULL;
 }
 
-#define NUMBER_THREADS 15000
+#define NUMBER_THREADS 2000
 int main(){
     int i;
     int tids[NUMBER_THREADS];

@@ -33,13 +33,16 @@ $(BIN_DIR)able_threads.o: $(SRC_DIR)able_threads.c
 	$(CC) $(CFLAGS) -c -o $(BIN_DIR)able_threads.o -I$(INC_DIR) $(SRC_DIR)able_threads.c
 
 # VM RULES
-.PHONY: init pull 
+.PHONY: init pull tar
 init:
-	@sudo mount -t vboxsf -o uid=1000 cthreads /home/aluno/Share/
+	@sudo mount -t vboxsf -o uid=1000 cthread /home/aluno/Share/
 
 pull: init
 	@rm -r ./* && cp -r ~/Share/* ./
 
+tar:
+	@cd .. && tar -zcvf cthread.tar.gz cthread
+	
 # Copy of support.o because it's removed in clean up process
 clean:
 	rm -rf $(BIN_DIR)*.o $(SRC_DIR)*~ $(INC_DIR)*~ $(LIB_DIR)*.a *~ && \
