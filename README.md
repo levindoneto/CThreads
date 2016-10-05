@@ -1,5 +1,5 @@
 # CThreads
-__Autores:__ Béuren F. Beclhin, Eduardo Brito, Levindo Neto
+__Autores:__ Béuren F. Bechlin, Eduardo Brito, Levindo Neto
 
 https://docs.google.com/document/d/17syKIuhr6S4mYxGgzHB40oW_B9EHaY-LuGk40YL93KE/edit
 
@@ -7,17 +7,17 @@ https://docs.google.com/document/d/17syKIuhr6S4mYxGgzHB40oW_B9EHaY-LuGk40YL93KE/
 
 ### Estrutura dos Estados
 
-A fila de aptos é apenas uma fila encadeada simples, uma vez que como é usado o 
+A fila de aptos é modelada como uma árvore rubro-negra, uma vez que como é usado o 
 sorteio para a seleção de qual será o processo usado, não tem como ser FIFO ou SJF.
-Para os bloqueados, será uma fila FIFO para aqueles que foram bloqueados pelo semáforo. 
+Para os bloqueados, é uma árvore rubro-negra para aqueles que foram bloqueados pelo semáforo. 
 
-Também haverá uma fila para processos bloqueados por ter dado cjoin, 
+Também há uma rubro-negra para processos bloqueados por ter dado cjoin, 
 que ficam bloqueados esperando a thread. Quando as threads são finalizadas
 é necessário fazer a varredura para verificar se algum bloqueado pode passar para apto. 
 
 ### Sorteio de bilhetes
 
-Pode-se implementar uma lista duplamente encadeada, na qual, dado um número 
+É implementado uma lista duplamente encadeada, na qual, dado um número 
 inteiro de bilhete (0-255), percorre-se essa lista sempre salvando o elemento 
 anterior na tentativa de encontrar o número referente ao bilhete, se chegar em 
 um valor maior que o número de bilhete pesquisado, compara-se a diferença desse
