@@ -1,8 +1,6 @@
 # CThreads
 __Autores:__ Béuren F. Bechlin, Eduardo Brito, Levindo Neto
 
-https://docs.google.com/document/d/17syKIuhr6S4mYxGgzHB40oW_B9EHaY-LuGk40YL93KE/edit
-
 ![States](/resources/States.png)
 
 ### Estrutura dos Estados
